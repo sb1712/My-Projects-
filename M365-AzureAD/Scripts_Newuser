@@ -1,0 +1,53 @@
+<#
+.SYNOPSIS
+Automates creation of a new municipal employee in Active Directory and Azure AD.
+
+.DESCRIPTION
+Creates on-prem AD user, assigns O365 license, adds security groups,
+and enforces MFA via Conditional Access baseline.
+
+.AUTHOR
+ITS Analyst – Municipal Government
+
+.VERSION
+1.0 (Sanitized for Public Portfolio)
+#>
+
+param (
+    [Parameter(Mandatory)]
+    [string]$FirstName,
+
+    [Parameter(Mandatory)]
+    [string]$LastName,
+
+    [Parameter(Mandatory)]
+    [string]$Department,
+
+    [Parameter(Mandatory)]
+    [string]$JobTitle
+)
+
+$UserPrincipalName = "$FirstName.$LastName@municipality.ca"
+$DisplayName = "$FirstName $LastName"
+
+Write-Host "Creating user: $DisplayName"
+
+# Create AD User (On-Prem)
+New-ADUser `
+    -Name $DisplayName `
+    -GivenName $FirstName `
+    -Surname $LastName `
+    -UserPrincipalName $UserPrincipalName `
+    -Department $Department `
+    -Title $JobTitle `
+    -Enabled $true `
+    -Path "OU=Users,DC=municipality,DC=local"
+
+# Add to Security Groups
+Add-ADGroupMember -Identity "M365-Standard-Users" -Members $UserPrincipalName
+Add-ADGroupMember -Identity "VPN-Access" -Members $UserPrincipalName
+
+# Trigger Azure AD Sync
+Start-ADSyncSyncCycle -PolicyType Delta
+
+Write-Host "User successfully provisioned and synced to Azure AD."

@@ -1,0 +1,17 @@
+<#
+.SYNOPSIS
+Assigns Microsoft 365 licenses and service plans.
+
+.DESCRIPTION
+Connects to Microsoft Graph and assigns E3 license to new users.
+
+#>
+
+Connect-MgGraph -Scopes "User.ReadWrite.All","Organization.Read.All"
+
+$UserUPN = "firstname.lastname@municipality.ca"
+$LicenseSku = "ENTERPRISEPACK" # Microsoft 365 E3
+
+Set-MgUserLicense -UserId $UserUPN -AddLicenses @{SkuId=$LicenseSku} -RemoveLicenses @()
+
+Write-Host "Microsoft 365 license successfully assigned to $UserUPN"

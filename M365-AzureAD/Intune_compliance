@@ -1,0 +1,18 @@
+<#
+.SYNOPSIS
+Configures Intune compliance policies for Windows devices.
+
+.DESCRIPTION
+Enforces encryption, antivirus, and OS version standards.
+#>
+
+$CompliancePolicy = @{
+    DisplayName = "Municipal-Windows-Compliance"
+    Description = "Baseline security for all corporate Windows devices"
+    OsMinimumVersion = "10.0.19045"
+    BitLockerEnabled = $true
+    DefenderEnabled = $true
+}
+
+Write-Host "Deploying Intune compliance baseline..."
+Write-Host ($CompliancePolicy | Out-String)

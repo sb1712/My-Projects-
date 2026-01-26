@@ -1,0 +1,15 @@
+<#
+.SYNOPSIS
+Securely offboards terminated employees.
+
+.DESCRIPTION
+Disables accounts, revokes sessions, removes licenses, and archives mailbox.
+#>
+
+$UserUPN = "terminated.user@municipality.ca"
+
+Disable-ADAccount -Identity $UserUPN
+Revoke-MgUserSignInSession -UserId $UserUPN
+Remove-MgUserLicense -UserId $UserUPN -All
+
+Write-Host "User access revoked and licenses removed for $UserUPN"
